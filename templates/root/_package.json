@@ -2,7 +2,7 @@
   "private": "true",
   "devDependencies": {
     "gulp-assemble": "^0.3.2",
-    "assemble": "^0.6.0",
+    "assemble": "^0.6.0-beta.5",
     "gulp-extname": "^0.2.0",
     "gulp": "^3.8.11",
     "gulp-htmlmin": "^1.1.1",
