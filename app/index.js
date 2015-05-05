@@ -90,7 +90,7 @@ Generator.prototype.jsScaffold = function jsScaffold() {
 
   this.template(pathFrom + 'main.coffee', pathTo + 'main.coffee');
   this.template(pathFrom + 'modules/log.coffee', pathTo + 'modules/log.coffee');
-  this.template(pathFrom + 'standalone/html5shiw-printshiv.js', pathTo + 'standalone/html5shiw-printshiv.js');
+  this.template(pathFrom + 'standalone/html5shiv-printshiv.js', pathTo + 'standalone/html5shiv-printshiv.js');
   this.template(pathFrom + 'vendor/picturefill.js', pathTo + 'vendor/picturefill.js');
 };
 
