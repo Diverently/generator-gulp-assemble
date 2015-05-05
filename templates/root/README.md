@@ -1,7 +1,6 @@
-# <%= _.slugify(_.humanize(sitename)) %>
+# <%= sitename %>
 
-This website is generated with [yo gulp-assemble generator](https://github.com/Diverently/generator-gulp-assemble)
-version <%= pkg.version %>.
+This website is generated with [yo gulp-assemble generator](https://github.com/Diverently/generator-gulp-assemble).
 
 ## Build & development
 

@@ -5,6 +5,7 @@ var util = require('util');
 var yeoman = require('yeoman-generator');
 var yosay = require('yosay');
 var chalk = require('chalk');
+var s = require('underscore.string');
 
 var Generator = module.exports = function Generator(args, options) {
 
@@ -12,7 +13,7 @@ var Generator = module.exports = function Generator(args, options) {
   yeoman.generators.Base.apply(this, arguments);
   this.argument('sitename', { type: String, required: false });
   this.sitename = this.sitename || path.basename(process.cwd());
-  this.sitename = this._.camelize(this._.slugify(this._.humanize(this.sitename)));
+  this.sitename = s.humanize(this.sitename);
 
   // Install dependencies after creating the site
   this.on('end', function () {
@@ -23,6 +24,7 @@ var Generator = module.exports = function Generator(args, options) {
   });
 
   this.pkg = require('../package.json');
+  this.sourceRoot(path.join(__dirname, '../templates'));
 };
 
 util.inherits(Generator, yeoman.generators.Base);
@@ -71,7 +73,11 @@ Generator.prototype.siteScaffold = function siteScaffold() {
   this.template('site/data/data.yml', 'src/data/data.yml');
   this.template('site/data/books.json', 'src/data/books.json');
   // Assets
-  this.template('site/assets/css/main.scss', 'src/assets/css/main.scss');
+  this.fs.copyTpl(
+    this.templatePath('site/assets/css/main.scss'),
+    this.destinationPath('src/assets/css/main.scss'),
+    { sitename: this.sitename }
+  );
   this.template('site/assets/css/_settings.scss', 'src/assets/css/_settings.scss');
   this.template('site/assets/css/modules/_site-navigation.scss', 'src/assets/css/modules/_site-navigation.scss');
   this.template('site/assets/css/core/_mixins.scss', 'src/assets/css/core/_mixins.scss');
@@ -83,7 +89,11 @@ Generator.prototype.siteScaffold = function siteScaffold() {
 Generator.prototype.packageFiles = function packageFiles() {
   this.template('root/_package.json', 'package.json');
   this.template('root/_gulpfile.js', 'gulpfile.js');
-  this.template('root/README.md', 'README.md');
+  this.fs.copyTpl(
+    this.templatePath('root/README.md'),
+    this.destinationPath('README.md'),
+    { sitename: this.sitename }
+  );
   this.template('root/.editorconfig', '.editorconfig');
   this.template('root/gitignore', '.gitignore');
   this.template('root/.gitattributes', '.gitattributes');
