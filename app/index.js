@@ -66,7 +66,11 @@ Generator.prototype.siteScaffold = function siteScaffold() {
   this.template('site/robots.txt', 'src/robots.txt');
   this.template('site/.htaccess', 'src/.htaccess');
   // Assemble
-  this.template('site/layouts/default.hbs', 'src/layouts/default.hbs');
+  this.fs.copyTpl(
+    this.templatePath('site/layouts/default.hbs'),
+    this.destinationPath('src/layouts/default.hbs'),
+    { sitename: this.sitename }
+  );
   this.template('site/pages/index.hbs', 'src/pages/index.hbs');
   this.template('site/pages/books.hbs', 'src/pages/books.hbs');
   this.template('site/partials/site-navigation.hbs', 'src/partials/site-navigation.hbs');

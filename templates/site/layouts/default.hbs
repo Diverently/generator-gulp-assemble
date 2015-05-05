@@ -16,5 +16,14 @@
 
     {% body %}
 
+    {{!-- Structured Data --}}
+    {{!-- https://developers.google.com/structured-data/site-name --}}
+    <script type="application/ld+json">
+    {  "@context" : "http://schema.org",
+       "@type" : "WebSite",
+       "name" : "<%= sitename %>",
+       "url" : "http://www.example.com"
+    }
+    </script>
   </body>
 </html>
