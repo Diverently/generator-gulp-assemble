@@ -11,12 +11,18 @@
   ],
   "author": "Diverently GmbH",
   "main": "app/index.js",
-  "repository": "Diverently/generator-gulp-assemble",
-  "bugs": "Diverently/generator-gulp-assemble/issues",
-  "files": [],
+  "repository": "https://github.com/Diverently/generator-gulp-assemble",
+  "bugs": "https://github.com/Diverently/generator-gulp-assemble/issues",
+  "files": [
+    "app",
+    "templates"
+  ],
   "dependencies": {
     "yeoman-generator": "^0.19.2",
     "chalk": "^1.0.0",
     "yosay": "^1.0.3"
+  },
+  "devDependencies": {
+    "underscore.string": "^3.0.3"
   }
 }
