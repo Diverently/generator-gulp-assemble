@@ -74,7 +74,11 @@ Generator.prototype.siteScaffold = function siteScaffold() {
   this.template('site/pages/index.hbs', 'src/pages/index.hbs');
   this.template('site/pages/books.hbs', 'src/pages/books.hbs');
   this.template('site/partials/site-navigation.hbs', 'src/partials/site-navigation.hbs');
-  this.template('site/data/data.yml', 'src/data/data.yml');
+  this.fs.copyTpl(
+    this.templatePath('site/data/data.yml'),
+    this.destinationPath('src/data/data.yml'),
+    { sitename: this.sitename }
+  );
   this.template('site/data/books.json', 'src/data/books.json');
   // Assets
   this.fs.copyTpl(
