@@ -1,0 +1,22 @@
+{
+  "name": "generator-gulp-assemble",
+  "version": "0.1.0",
+  "description": "Yeoman generator for static websites with Gulp and Assemble",
+  "keywords": [
+    "yeoman-generator",
+    "static",
+    "website",
+    "gulp",
+    "assemble"
+  ],
+  "author": "Diverently GmbH",
+  "main": "app/index.js",
+  "repository": "Diverently/generator-gulp-assemble",
+  "bugs": "Diverently/generator-gulp-assemble/issues",
+  "files": [],
+  "dependencies": {
+    "yeoman-generator": "^0.19.2",
+    "chalk": "^1.0.0",
+    "yosay": "^1.0.3"
+  }
+}
