@@ -6,6 +6,7 @@ var assemble        = require('assemble');
 var browserify      = require('browserify');
 var source          = require('vinyl-source-stream');
 var mainBowerFiles  = require('main-bower-files');
+var runSequence     = require('run-sequence');
 var $ = gulpLoadPlugins();
 
 // Paths
@@ -77,6 +78,14 @@ var config = {
 // Server Tasks
 // ----------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
+
+// Clean
+// ----------------------------------------------------------------------------------------------------------
+gulp.task('clean-tmp', function() {
+  return gulp.src('.tmp/', { read: false })
+    .pipe($.clean());
+});
+
 
 // Assemble
 // ----------------------------------------------------------------------------------------------------------
@@ -251,4 +260,6 @@ gulp.task('watch', function() {
 
 // Production Tasks
 // ----------------------------------------------------------------------------------------------------------
-gulp.task('default', ['browser-sync', 'watch']);
+gulp.task('default', function() {
+  runSequence(['clean-tmp'], ['browser-sync'], ['watch']);
+});
