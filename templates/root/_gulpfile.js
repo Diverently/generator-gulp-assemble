@@ -32,6 +32,42 @@ var paths = {
     modulesEntry: './src/assets/js/main.coffee',
     tmp: '.tmp/js/',
     tmpStandalone: '.tmp/js/standalone/'
+  },
+  images: {
+    srcDir: 'src/assets/img/',
+    tmpDir: '.tmp/img/',
+    faviconSrc: 'src/assets/favicons/**',
+    faviconDest: 'build/'
+  },
+  sprites: {
+    srcDir: 'src/assets/img/sprite-svg/',
+    scss: '../../../../src/assets/css/core/_sprite.scss',
+    tmp: '.tmp/img/sprite/'
+  }
+};
+
+// Sprite config
+var config = {
+  sprites: {
+    mode : {
+      css : {
+        dest : 'sprite',
+        sprite: 'sprite',
+        render : {
+          scss : {
+            template: paths.sprites.srcDir + 'template.scss',
+            dest: paths.sprites.scss
+          }
+        },
+        variables   : {
+          png : function() {
+            return function(sprite, render) {
+              return render(sprite).split('.svg').join('.png');
+            };
+          }
+        }
+      }
+    }
   }
 };
 
@@ -152,9 +188,48 @@ gulp.task('scripts-tmp', ['browserify', 'bower', 'standalone-tmp', 'modernizr'],
 });
 
 
+// Sprites
+// ----------------------------------------------------------------------------------------------------------
+// $.svgSprite creates a `sprite` folder
+gulp.task('sprite-svg-tmp', function() {
+  return gulp.src(paths.sprites.srcDir + '*.svg')
+    .pipe($.svgSprite(config.sprites))
+    .pipe(gulp.dest(paths.images.tmpDir));
+});
+
+gulp.task('sprite-png-tmp', ['sprite-svg-tmp'], function() {
+  return gulp.src(paths.sprites.tmp + '*.svg')
+    .pipe($.svg2png())
+    .pipe($.imagemin({progressive: true}))
+    .pipe(gulp.dest(paths.sprites.tmp));
+});
+
+gulp.task('sprite-tmp', ['sprite-png-tmp'], function() {
+  browserSync.reload({
+    stream: true,
+    once: true
+  });
+});
+
+
+// Other images
+// -----------------------------------------------------------------------------------------------------------
+gulp.task('images-tmp', function() {
+  return gulp.src([paths.images.srcDir + '**/*.{png,jpg,gif}', '!' + paths.images.srcDir + 'sprite/'])
+    .pipe($.newer(paths.images.tmpDir))
+    .pipe($.imagemin({progressive: true}))
+    .pipe(gulp.dest(paths.images.tmpDir));
+});
+
+gulp.task('favicons-build', function() {
+  return gulp.src(paths.images.faviconSrc)
+    .pipe(gulp.dest(paths.images.faviconDest));
+});
+
+
 // Browser Sync
 // ----------------------------------------------------------------------------------------------------------
-gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp', 'scripts-tmp'], function() {
+gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp', 'scripts-tmp', 'sprite-tmp', 'images-tmp'], function() {
   browserSync({
     server: {
       baseDir: '.tmp'
@@ -163,22 +238,12 @@ gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp', 'scripts-t
 });
 
 
-
-
 // Watch Files
 // ----------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------
 gulp.task('watch', function() {
-  // Server
   gulp.watch([paths.assemble.pages, paths.assemble.partials, paths.assemble.data], ['assemble-tmp']);
   gulp.watch(paths.css.srcAll, ['styles-tmp']);
-  gulp.watch([
-    './bower_components/**/*.js',
-    paths.js.srcDir + 'vendor/*.{js,coffee}',
-    paths.js.srcDir + 'modules/**/*.{js,coffee}',
-    paths.js.srcDir + 'standalone/**/*.js',
-    paths.js.srcDir.modulesEntry
-  ], ['scripts-tmp']);
+  gulp.watch(['bower_components/**/*.js', paths.js.srcDir + 'vendor/*.js', paths.js.srcDir + 'modules/**/*.coffee', paths.js.srcDir + 'standalone/**/*.js'], ['scripts-tmp']);
 });
 
 
