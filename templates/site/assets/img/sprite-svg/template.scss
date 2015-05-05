@@ -1,0 +1,38 @@
+// General mixin
+@mixin sprite($sprite, $dims: true) {
+  background-repeat: no-repeat;
+  background-image: url(/img/sprite/{{{sprite}}});
+  .no-svg & {
+    background-image: url(/img/sprite/{{#sprite}}{{#png}}{{{sprite}}}{{/png}}{{/sprite}});
+  }
+{{#shapes}}
+  @if '.svg-#{$sprite}' == '{{#selector.shape}}{{expression}}{{/selector.shape}}' {
+    background-position: {{position.relative.xy}};
+    @if $dims == true {
+      width: {{width.outer}}px;
+      height: {{height.outer}}px;
+    }
+  }
+{{/shapes}}
+}
+
+// Specific functions
+@function sprite-width($sprite) {
+  $width: 0px;
+{{#shapes}}
+  @if '.svg-#{$sprite}' == '{{#selector.shape}}{{expression}}{{/selector.shape}}' {
+    $width: {{width.outer}}px;
+  }
+{{/shapes}}
+  @return $width;
+}
+
+@function sprite-height($sprite) {
+  $height: 0px;
+{{#shapes}}
+  @if '.svg-#{$sprite}' == '{{#selector.shape}}{{expression}}{{/selector.shape}}' {
+    $height: {{height.outer}}px;
+  }
+{{/shapes}}
+  @return $height;
+}

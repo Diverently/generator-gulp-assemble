@@ -94,6 +94,15 @@ Generator.prototype.jsScaffold = function jsScaffold() {
   this.template(pathFrom + 'vendor/picturefill.js', pathTo + 'vendor/picturefill.js');
 };
 
+// Image Scaffold
+Generator.prototype.imageScaffold = function imageScaffold() {
+  var pathFrom = 'site/assets/img/',
+      pathTo   = 'src/assets/img/';
+
+  this.template(pathFrom + 'sprite-svg/template.scss', pathTo + 'sprite-svg/template.scss');
+  this.template(pathFrom + 'sprite-svg/github.svg', pathTo + 'sprite-svg/github.svg');
+};
+
 // Tool Files
 Generator.prototype.packageFiles = function packageFiles() {
   this.template('root/_package.json', 'package.json');
