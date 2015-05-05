@@ -60,6 +60,8 @@ Generator.prototype.assembleScaffold = function assembleScaffold() {
   this.template('site/pages/index.hbs', 'src/pages/index.hbs');
   this.template('site/pages/books.hbs', 'src/pages/books.hbs');
   this.template('site/partials/site-navigation.hbs', 'src/partials/site-navigation.hbs');
+  this.template('site/partials/load-assets.hbs', 'src/partials/load-assets.hbs');
+  this.template('site/partials/favicons.hbs', 'src/partials/favicons.hbs');
   this.fs.copyTpl(
     this.templatePath('site/data/data.yml'),
     this.destinationPath('src/data/data.yml'),
