@@ -144,7 +144,11 @@ gulp.task('scripts-tmp', ['browserify', 'bower', 'standalone-tmp', 'modernizr'],
       paths.js.srcDir + 'browserify.js'
     ])
     .pipe($.concat('build.js'))
-    .pipe(gulp.dest(paths.js.tmp));
+    .pipe(gulp.dest(paths.js.tmp))
+    .pipe(browserSync.reload({
+      stream: true,
+      once: true
+    }));
 });
 
 
@@ -165,9 +169,16 @@ gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp', 'scripts-t
 // ----------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
 gulp.task('watch', function() {
+  // Server
   gulp.watch([paths.assemble.pages, paths.assemble.partials, paths.assemble.data], ['assemble-tmp']);
   gulp.watch(paths.css.srcAll, ['styles-tmp']);
-  gulp.watch(paths.css.src, ['fonts-tmp']);
+  gulp.watch([
+    './bower_components/**/*.js',
+    paths.js.srcDir + 'vendor/*.{js,coffee}',
+    paths.js.srcDir + 'modules/**/*.{js,coffee}',
+    paths.js.srcDir + 'standalone/**/*.js',
+    paths.js.srcDir.modulesEntry
+  ], ['scripts-tmp']);
 });
 
 
