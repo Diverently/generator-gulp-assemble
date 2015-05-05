@@ -41,31 +41,17 @@ Generator.prototype.welcome = function welcome() {
   }
 };
 
-// Generator.prototype.askForRepository = function askForRepository() {
-//   var cb = this.async();
-//
-//   this.prompt([{
-//     type: 'confirm',
-//     name: 'repoExists',
-//     message: 'Do you have a GitHub repo for this site?',
-//     default: false
-//   }, {
-//     type: 'input',
-//     name: 'repoName',
-//     message: 'What is it called?',
-//     when: function (props) {
-//       return props.repoExists;
-//     }
-//   }], function (props) {
-//     this.repoExists = props.repoExists;
-//     this.repoName = props.repoName;
-//   }.bind(this));
-// };
-
+// General stuff
 Generator.prototype.siteScaffold = function siteScaffold() {
   this.template('site/robots.txt', 'src/robots.txt');
   this.template('site/.htaccess', 'src/.htaccess');
-  // Assemble
+
+  this.mkdir('src/assets/favicons');
+  this.mkdir('src/assets/fonts');
+};
+
+// Assemble Scaffold
+Generator.prototype.assembleScaffold = function assembleScaffold() {
   this.fs.copyTpl(
     this.templatePath('site/layouts/default.hbs'),
     this.destinationPath('src/layouts/default.hbs'),
@@ -80,22 +66,42 @@ Generator.prototype.siteScaffold = function siteScaffold() {
     { sitename: this.sitename }
   );
   this.template('site/data/books.json', 'src/data/books.json');
-  // Assets
-  this.fs.copyTpl(
-    this.templatePath('site/assets/css/main.scss'),
-    this.destinationPath('src/assets/css/main.scss'),
-    { sitename: this.sitename }
-  );
-  this.template('site/assets/css/_settings.scss', 'src/assets/css/_settings.scss');
-  this.template('site/assets/css/modules/_site-navigation.scss', 'src/assets/css/modules/_site-navigation.scss');
-  this.template('site/assets/css/core/_mixins.scss', 'src/assets/css/core/_mixins.scss');
-  this.mkdir('src/assets/favicons');
-  this.mkdir('src/assets/fonts');
-  this.mkdir('src/assets/js');
 };
 
+// CSS Scaffold
+Generator.prototype.cssScaffold = function cssScaffold() {
+  var pathFrom = 'site/assets/css/',
+      pathTo   = 'src/assets/css/';
+
+  this.fs.copyTpl(
+    this.templatePath(pathFrom + 'main.scss'),
+    this.destinationPath(pathTo + 'main.scss'),
+    { sitename: this.sitename }
+  );
+  this.template(pathFrom + '_settings.scss', pathTo + '_settings.scss');
+  this.template(pathFrom + 'modules/_site-navigation.scss', pathTo + 'modules/_site-navigation.scss');
+  this.template(pathFrom + 'core/_mixins.scss', pathTo + 'core/_mixins.scss');
+};
+
+// JavaScript Scaffold
+Generator.prototype.jsScaffold = function jsScaffold() {
+  var pathFrom = 'site/assets/js/',
+      pathTo   = 'src/assets/js/';
+
+  this.template(pathFrom + 'main.coffee', pathTo + 'main.coffee');
+  this.template(pathFrom + 'modules/log.coffee', pathTo + 'modules/log.coffee');
+  this.template(pathFrom + 'standalone/html5shiw-printshiv.js', pathTo + 'standalone/html5shiw-printshiv.js');
+  this.template(pathFrom + 'vendor/picturefill.js', pathTo + 'vendor/picturefill.js');
+};
+
+// Tool Files
 Generator.prototype.packageFiles = function packageFiles() {
   this.template('root/_package.json', 'package.json');
+  this.fs.copyTpl(
+    this.templatePath('root/_bower.json'),
+    this.destinationPath('bower.json'),
+    { sitename: this.sitename }
+  );
   this.template('root/_gulpfile.js', 'gulpfile.js');
   this.fs.copyTpl(
     this.templatePath('root/README.md'),

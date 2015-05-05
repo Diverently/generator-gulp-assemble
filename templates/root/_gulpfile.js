@@ -1,9 +1,12 @@
 'use strict';
-var gulp = require('gulp');
+var gulp            = require('gulp');
 var gulpLoadPlugins = require('gulp-load-plugins');
+var browserSync     = require('browser-sync');
+var assemble        = require('assemble');
+var browserify      = require('browserify');
+var source          = require('vinyl-source-stream');
+var mainBowerFiles  = require('main-bower-files');
 var $ = gulpLoadPlugins();
-var assemble = require('assemble');
-var browserSync    = require('browser-sync');
 
 // Paths
 var paths = {
@@ -23,6 +26,12 @@ var paths = {
     srcAll: 'src/assets/css/**/*.scss',
     tmp: '.tmp/css/',
     dest: 'build/css/'
+  },
+  js: {
+    srcDir: 'src/assets/js/',
+    modulesEntry: './src/assets/js/main.coffee',
+    tmp: '.tmp/js/',
+    tmpStandalone: '.tmp/js/standalone/'
   }
 };
 
@@ -31,7 +40,10 @@ var paths = {
 
 // Server Tasks
 // ----------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------
+
 // Assemble
+// ----------------------------------------------------------------------------------------------------------
 gulp.task('assemble-tmp', function () {
   // Assemble Options
   assemble.layouts(paths.assemble.layouts);
@@ -56,6 +68,7 @@ gulp.task('assemble-tmp', function () {
 
 
 // Fonts
+// ----------------------------------------------------------------------------------------------------------
 gulp.task('fonts-tmp', function() {
   return gulp.src(paths.fonts.src)
     .pipe($.newer(paths.fonts.tmp))
@@ -64,6 +77,7 @@ gulp.task('fonts-tmp', function() {
 
 
 // Styles
+// ----------------------------------------------------------------------------------------------------------
 gulp.task('styles-tmp', function() {
   return gulp.src(paths.css.src)
     .pipe($.sass({
@@ -80,7 +94,63 @@ gulp.task('styles-tmp', function() {
 });
 
 
-gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp'], function() {
+// Scripts
+// ----------------------------------------------------------------------------------------------------------
+// Create your main JS stuff
+gulp.task('browserify', function() {
+  return browserify({
+      entries: paths.js.modulesEntry,
+      extensions: ['.coffee', '.js']
+    })
+    .transform('coffeeify')
+    .bundle()
+    .pipe(source('browserify.js'))
+    .pipe(gulp.dest(paths.js.srcDir));
+});
+
+// Get all Bower JS files
+gulp.task('bower', function() {
+  return gulp.src(mainBowerFiles(), { base: './bower_components' })
+    .pipe($.concat('bower.js'))
+    .pipe(gulp.dest(paths.js.srcDir));
+});
+
+// Get an individual Modernizr build
+gulp.task('modernizr', function() {
+  gulp.src([paths.js.srcDir + '**/*.js', paths.js.srcDir + '**/*.coffee', paths.css.srcAll])
+    .pipe($.modernizr({
+      options: [
+        'setClasses',
+        'addTest',
+        'testProp',
+        'fnBind'
+      ]
+    }))
+    .pipe(gulp.dest(paths.js.srcDir));
+});
+
+// Let standalone scripts be by themselves, e.g. html5shiv
+gulp.task('standalone-tmp', function() {
+  return gulp.src(paths.js.srcDir + 'standalone/**/*.js')
+    .pipe($.uglify())
+    .pipe(gulp.dest(paths.js.tmpStandalone));
+});
+
+gulp.task('scripts-tmp', ['browserify', 'bower', 'standalone-tmp', 'modernizr'], function() {
+  return gulp.src([
+      paths.js.srcDir + 'bower.js',
+      paths.js.srcDir + 'vendor/*.{js,coffee}',
+      paths.js.srcDir + 'modernizr.js',
+      paths.js.srcDir + 'browserify.js'
+    ])
+    .pipe($.concat('build.js'))
+    .pipe(gulp.dest(paths.js.tmp));
+});
+
+
+// Browser Sync
+// ----------------------------------------------------------------------------------------------------------
+gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp', 'scripts-tmp'], function() {
   browserSync({
     server: {
       baseDir: '.tmp'
@@ -91,7 +161,8 @@ gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp'], function(
 
 
 
-// Watch Tasks
+// Watch Files
+// ----------------------------------------------------------------------------------------------------------
 // ----------------------------------------------------------------------------------------------------------
 gulp.task('watch', function() {
   gulp.watch([paths.assemble.pages, paths.assemble.partials, paths.assemble.data], ['assemble-tmp']);
@@ -102,6 +173,6 @@ gulp.task('watch', function() {
 
 
 
-// Default Task
+// Production Tasks
 // ----------------------------------------------------------------------------------------------------------
 gulp.task('default', ['browser-sync', 'watch']);
