@@ -82,7 +82,7 @@ var config = {
 
 // Clean
 // ----------------------------------------------------------------------------------------------------------
-gulp.task('clean-tmp', function() {
+gulp.task('clean:tmp', function() {
   del([
     '.tmp/**/*'
   ]);
@@ -263,5 +263,5 @@ gulp.task('watch', function() {
 // Production Tasks
 // ----------------------------------------------------------------------------------------------------------
 gulp.task('default', function() {
-  runSequence(['clean-tmp'], ['browser-sync'], ['watch']);
+  runSequence(['browser-sync'], ['watch']);
 });
