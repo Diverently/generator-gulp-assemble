@@ -5,6 +5,7 @@ var util = require('util');
 var yeoman = require('yeoman-generator');
 var yosay = require('yosay');
 var chalk = require('chalk');
+var mkdirp = require('mkdirp');
 var s = require('underscore.string');
 
 var Generator = module.exports = function Generator(args, options) {
@@ -46,8 +47,8 @@ Generator.prototype.siteScaffold = function siteScaffold() {
   this.template('site/robots.txt', 'src/robots.txt');
   this.template('site/.htaccess', 'src/.htaccess');
 
-  this.mkdir('src/assets/favicons');
-  this.mkdir('src/assets/fonts');
+  mkdirp('src/assets/favicons');
+  mkdirp('src/assets/fonts');
 };
 
 // Assemble Scaffold
