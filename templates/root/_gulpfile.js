@@ -7,6 +7,7 @@ var browserify      = require('browserify');
 var source          = require('vinyl-source-stream');
 var mainBowerFiles  = require('main-bower-files');
 var runSequence     = require('run-sequence');
+var del             = require('del');
 var $ = gulpLoadPlugins();
 
 // Paths
@@ -82,8 +83,9 @@ var config = {
 // Clean
 // ----------------------------------------------------------------------------------------------------------
 gulp.task('clean-tmp', function() {
-  return gulp.src('.tmp/', { read: false })
-    .pipe($.clean());
+  del([
+    '.tmp/**/*'
+  ]);
 });
 
 
