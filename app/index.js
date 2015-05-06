@@ -18,10 +18,14 @@ var Generator = module.exports = function Generator(args, options) {
 
   // Install dependencies after creating the site
   this.on('end', function () {
-    this.installDependencies({
-      skipInstall: this.options['skip-install'],
-      skipMessage: this.options['skip-message']
-    });
+    this.log(
+      chalk.white(
+        '\n' +
+        'I\'m all done. Next you should run ' +
+        chalk.yellow.underline('npm install && bower install') +
+        ' to install the required dependencies.'
+      )
+    );
   });
 
   this.pkg = require('../package.json');
