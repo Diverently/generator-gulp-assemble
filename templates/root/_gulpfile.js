@@ -43,7 +43,7 @@ var paths = {
   },
   sprites: {
     srcDir: 'src/assets/img/sprite-svg/',
-    scss: '../../../../src/assets/css/core/_sprite.scss',
+    scss: '../../../src/assets/css/core/_sprite.scss',
     tmp: '.tmp/img/sprite/'
   }
 };
