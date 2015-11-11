@@ -113,11 +113,6 @@ Generator.prototype.imageScaffold = function imageScaffold() {
 // Tool Files
 Generator.prototype.packageFiles = function packageFiles() {
   this.template('root/_package.json', 'package.json');
-  this.fs.copyTpl(
-    this.templatePath('root/_bower.json'),
-    this.destinationPath('bower.json'),
-    { sitename: this.sitename }
-  );
   this.template('root/_gulpfile.js', 'gulpfile.js');
   this.fs.copyTpl(
     this.templatePath('root/README.md'),
