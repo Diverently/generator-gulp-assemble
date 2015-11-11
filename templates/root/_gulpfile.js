@@ -5,7 +5,6 @@ var browserSync     = require('browser-sync');
 var assemble        = require('assemble');
 var browserify      = require('browserify');
 var source          = require('vinyl-source-stream');
-var mainBowerFiles  = require('main-bower-files');
 var runSequence     = require('run-sequence');
 var del             = require('del');
 var $ = gulpLoadPlugins();
@@ -31,7 +30,7 @@ var paths = {
   },
   js: {
     srcDir: 'src/assets/js/',
-    modulesEntry: './src/assets/js/main.coffee',
+    modulesEntry: './src/assets/js/main.js',
     tmp: '.tmp/js/',
     tmpStandalone: '.tmp/js/standalone/'
   },
@@ -51,6 +50,11 @@ var paths = {
 // Sprite config
 var config = {
   sprites: {
+    shape: {
+      spacing: {
+        padding: 2
+      }
+    },
     mode : {
       css : {
         dest : 'sprite',
@@ -77,11 +81,11 @@ var config = {
 
 
 // Server Tasks
-// ----------------------------------------------------------------------------------------------------------
-// ----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
 // Clean
-// ----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 gulp.task('clean:tmp', function() {
   del([
     '.tmp/**/*'
@@ -90,8 +94,8 @@ gulp.task('clean:tmp', function() {
 
 
 // Assemble
-// ----------------------------------------------------------------------------------------------------------
-gulp.task('assemble-tmp', function () {
+// -----------------------------------------------------------------------------
+gulp.task('assemble', function () {
   // Assemble Options
   assemble.layouts(paths.assemble.layouts);
   assemble.partials(paths.assemble.partials);
@@ -115,8 +119,8 @@ gulp.task('assemble-tmp', function () {
 
 
 // Fonts
-// ----------------------------------------------------------------------------------------------------------
-gulp.task('fonts-tmp', function() {
+// -----------------------------------------------------------------------------
+gulp.task('fonts', function() {
   return gulp.src(paths.fonts.src)
     .pipe($.newer(paths.fonts.tmp))
     .pipe(gulp.dest(paths.fonts.tmp));
@@ -124,8 +128,8 @@ gulp.task('fonts-tmp', function() {
 
 
 // Styles
-// ----------------------------------------------------------------------------------------------------------
-gulp.task('styles-tmp', function() {
+// -----------------------------------------------------------------------------
+gulp.task('styles', function() {
   return gulp.src(paths.css.src)
     .pipe($.sass({
       includePaths: ['css'],
@@ -142,30 +146,21 @@ gulp.task('styles-tmp', function() {
 
 
 // Scripts
-// ----------------------------------------------------------------------------------------------------------
-// Create your main JS stuff
-gulp.task('browserify', function() {
-  return browserify({
-      entries: paths.js.modulesEntry,
-      extensions: ['.coffee', '.js']
-    })
-    .transform('coffeeify')
-    .bundle()
-    .pipe(source('browserify.js'))
-    .pipe(gulp.dest(paths.js.srcDir));
-});
-
-// Get all Bower JS files
-gulp.task('bower', function() {
-  return gulp.src(mainBowerFiles(), { base: './bower_components' })
-    .pipe($.concat('bower.js'))
-    .pipe(gulp.dest(paths.js.srcDir));
+// -----------------------------------------------------------------------------
+// Let standalone scripts be by themselves, e.g. html5shiv
+gulp.task('standalone', function() {
+  return gulp.src(paths.js.srcDir + 'standalone/**/*.js')
+    .pipe($.uglify())
+    .pipe(gulp.dest(paths.js.tmpStandalone));
 });
 
 // Get an individual Modernizr build
 gulp.task('modernizr', function() {
   gulp.src([paths.js.srcDir + '**/*.js', paths.js.srcDir + '**/*.coffee', paths.css.srcAll])
     .pipe($.modernizr({
+      excludeTests: [
+        'hidden'
+      ],
       options: [
         'setClasses',
         'addTest',
@@ -176,19 +171,13 @@ gulp.task('modernizr', function() {
     .pipe(gulp.dest(paths.js.srcDir));
 });
 
-// Let standalone scripts be by themselves, e.g. html5shiv
-gulp.task('standalone-tmp', function() {
-  return gulp.src(paths.js.srcDir + 'standalone/**/*.js')
-    .pipe($.uglify())
-    .pipe(gulp.dest(paths.js.tmpStandalone));
-});
-
-gulp.task('scripts-tmp', ['browserify', 'bower', 'standalone-tmp', 'modernizr'], function() {
+gulp.task('scripts', ['standalone', 'modernizr'], function() {
   return gulp.src([
-      paths.js.srcDir + 'bower.js',
-      paths.js.srcDir + 'vendor/*.{js,coffee}',
+      // paths.js.srcDir + 'vendor/jquery.js',
+      paths.js.srcDir + 'vendor/*.js',
+      paths.js.srcDir + 'modules/*.js',
       paths.js.srcDir + 'modernizr.js',
-      paths.js.srcDir + 'browserify.js'
+      paths.js.srcDir + 'main.js'
     ])
     .pipe($.concat('build.js'))
     .pipe(gulp.dest(paths.js.tmp))
@@ -200,22 +189,22 @@ gulp.task('scripts-tmp', ['browserify', 'bower', 'standalone-tmp', 'modernizr'],
 
 
 // Sprites
-// ----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // $.svgSprite creates a `sprite` folder
-gulp.task('sprite-svg-tmp', function() {
+gulp.task('sprite-svg', function() {
   return gulp.src(paths.sprites.srcDir + '*.svg')
     .pipe($.svgSprite(config.sprites))
     .pipe(gulp.dest(paths.images.tmpDir));
 });
 
-gulp.task('sprite-png-tmp', ['sprite-svg-tmp'], function() {
+gulp.task('sprite-png', ['sprite-svg'], function() {
   return gulp.src(paths.sprites.tmp + '*.svg')
     .pipe($.svg2png())
     .pipe($.imagemin({progressive: true}))
     .pipe(gulp.dest(paths.sprites.tmp));
 });
 
-gulp.task('sprite-tmp', ['sprite-png-tmp'], function() {
+gulp.task('sprite', ['sprite-png'], function() {
   browserSync.reload({
     stream: true,
     once: true
@@ -224,8 +213,8 @@ gulp.task('sprite-tmp', ['sprite-png-tmp'], function() {
 
 
 // Other images
-// -----------------------------------------------------------------------------------------------------------
-gulp.task('images-tmp', function() {
+// ------------------------------------------------------------------------------
+gulp.task('images', function() {
   return gulp.src([paths.images.srcDir + '**/*.{png,jpg,gif}', '!' + paths.images.srcDir + 'sprite/'])
     .pipe($.newer(paths.images.tmpDir))
     .pipe($.imagemin({progressive: true}))
@@ -239,8 +228,8 @@ gulp.task('favicons-build', function() {
 
 
 // Browser Sync
-// ----------------------------------------------------------------------------------------------------------
-gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp', 'scripts-tmp', 'sprite-tmp', 'images-tmp'], function() {
+// -----------------------------------------------------------------------------
+gulp.task('browser-sync', ['assemble', 'fonts', 'styles', 'scripts', 'sprite', 'images'], function() {
   browserSync({
     server: {
       baseDir: '.tmp'
@@ -250,18 +239,32 @@ gulp.task('browser-sync', ['assemble-tmp', 'fonts-tmp', 'styles-tmp', 'scripts-t
 
 
 // Watch Files
-// ----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 gulp.task('watch', function() {
-  gulp.watch([paths.assemble.pages, paths.assemble.partials, paths.assemble.data], ['assemble-tmp']);
-  gulp.watch(paths.css.srcAll, ['styles-tmp']);
-  gulp.watch(['bower_components/**/*.js', paths.js.srcDir + 'vendor/*.js', paths.js.srcDir + 'modules/**/*.coffee', paths.js.srcDir + 'standalone/**/*.js'], ['scripts-tmp']);
+  gulp.watch([paths.assemble.pages, paths.assemble.partials, paths.assemble.data], ['assemble']);
+  gulp.watch(paths.css.srcAll, ['styles']);
+  gulp.watch([paths.js.srcDir + 'vendor/*.js', paths.js.srcDir + 'modules/**/*.js', paths.js.srcDir + 'standalone/**/*.js', paths.js.srcDir + 'main.js'], ['scripts']);
+  gulp.watch([paths.images.srcDir + '**/*.{png,jpg,gif}'], ['images']);
+  gulp.watch([paths.sprites.srcDir + '*.svg'], ['sprite']);
+  gulp.watch([paths.fonts.src], ['fonts']);
 });
 
 
+// Copy to dist
+// -----------------------------------------------------------------------------
+gulp.task('copyToDist', function() {
+  // This just copies the .tmp folder contents into dist
+  // The .tmp has to exist
+  gulp.src(['.tmp/**/*']).pipe(gulp.dest('dist'));
+});
 
 
 // Production Tasks
-// ----------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 gulp.task('default', function() {
   runSequence(['browser-sync'], ['watch']);
+});
+
+gulp.task('build', function() {
+  runSequence(['assemble', 'fonts', 'styles', 'scripts', 'sprite', 'images'], ['copyToDist']);
 });

@@ -11,10 +11,11 @@
   "noarg": true,
   "node": true,
   "quotmark": "single",
-  "strict": true,
+  "strict": false,
   "undef": true,
   "unused": true,
   "globals": {
-    "angular": false
+    "angular": false,
+    "$": false
   }
 }

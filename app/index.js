@@ -85,9 +85,9 @@ Generator.prototype.cssScaffold = function cssScaffold() {
     this.destinationPath(pathTo + 'main.scss'),
     { sitename: this.sitename }
   );
-  this.template(pathFrom + '_settings.scss', pathTo + '_settings.scss');
-  this.template(pathFrom + 'modules/_site-navigation.scss', pathTo + 'modules/_site-navigation.scss');
+  this.template(pathFrom + 'core/_settings.scss', pathTo + 'core/_settings.scss');
   this.template(pathFrom + 'core/_mixins.scss', pathTo + 'core/_mixins.scss');
+  this.template(pathFrom + 'modules/_site-navigation.scss', pathTo + 'modules/_site-navigation.scss');
 };
 
 // JavaScript Scaffold
@@ -95,8 +95,8 @@ Generator.prototype.jsScaffold = function jsScaffold() {
   var pathFrom = 'site/assets/js/',
       pathTo   = 'src/assets/js/';
 
-  this.template(pathFrom + 'main.coffee', pathTo + 'main.coffee');
-  this.template(pathFrom + 'modules/log.coffee', pathTo + 'modules/log.coffee');
+  this.template(pathFrom + 'main.js', pathTo + 'main.js');
+  this.template(pathFrom + 'modules/log.js', pathTo + 'modules/log.js');
   this.template(pathFrom + 'standalone/html5shiv-printshiv.js', pathTo + 'standalone/html5shiv-printshiv.js');
   this.template(pathFrom + 'vendor/picturefill.js', pathTo + 'vendor/picturefill.js');
 };
