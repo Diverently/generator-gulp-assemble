@@ -3,7 +3,6 @@ var gulp            = require('gulp');
 var gulpLoadPlugins = require('gulp-load-plugins');
 var browserSync     = require('browser-sync');
 var assemble        = require('assemble');
-var browserify      = require('browserify');
 var source          = require('vinyl-source-stream');
 var runSequence     = require('run-sequence');
 var del             = require('del');
