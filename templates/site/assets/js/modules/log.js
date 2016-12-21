@@ -8,7 +8,7 @@ var log = (function (output) {
 	}
 
 	moduleExport.moduleProperty = 1;
-	moduleExport.out = function () {
+	moduleExport.out = function (output) {
 		console.log(output);
 	};
 
